@@ -1,7 +1,12 @@
 import { nanoid } from '@blocksuite/store';
 import { Server } from '@hocuspocus/server';
 import fs from 'node:fs';
+import path from 'node:path';
 import * as Y from 'yjs';
+
+// Use project-local data directory instead of parent path
+const dataDir = path.resolve(process.cwd(), 'data');
+const getDocPath = (name: string) => path.join(dataDir, `${name}.yjs`);
 
 const server = Server.configure({
   port: 4333,
@@ -21,11 +26,11 @@ const server = Server.configure({
   },
   onLoadDocument: async (payload) => {
     const { documentName } = payload;
-    const path = `../data/${documentName}.yjs`;
+    const docPath = getDocPath(documentName);
 
-    if (fs.existsSync(path)) {
+    if (fs.existsSync(docPath)) {
       const doc = new Y.Doc();
-      const docData = fs.readFileSync(path);
+      const docData = fs.readFileSync(docPath);
       const uint8Array = new Uint8Array(docData);
       Y.applyUpdate(doc, uint8Array);
       return doc;
@@ -35,10 +40,12 @@ const server = Server.configure({
   },
   onStoreDocument: async (payload) => {
     const { documentName, document } = payload;
-    const path = `../data/${documentName}.yjs`;
+    const docPath = getDocPath(documentName);
+    // Ensure directory exists to prevent ENOENT
+    fs.mkdirSync(dataDir, { recursive: true });
 
     const update = Y.encodeStateAsUpdate(document);
-    fs.writeFileSync(path, update);
+    fs.writeFileSync(docPath, update);
   },
 });
 
@@ -71,7 +78,7 @@ const createEmptyDocument = async () => {
   };
 
   const [paragraph] = block('affine:paragraph', 1, {
-    text: new Y.Text('Hello World!'),
+    text: new Y.Text('你好，世界！'),
     type: 'text',
   });
 
@@ -97,7 +104,8 @@ const createEmptyDocument = async () => {
   );
 
   const [surface] = block('affine:surface', 5);
-  const [page] = block('affine:page', 2, { title: new Y.Text('Test') }, [
+  // 创建页面块以形成完整的文档结构，但不需要读取其返回值
+  block('affine:page', 2, { title: new Y.Text('测试') }, [
     surface,
     note,
   ]);

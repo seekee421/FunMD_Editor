@@ -4,14 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "server": "rimraf dist && tsup --sourcemap inline --watch --onSuccess 'node dist/esm/index.js'",
+    "server": "tsx src/server.ts",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
     "typescript": "^5.5.3",
-    "vite": "^5.4.0"
+    "vite": "^5.4.0",
+    "tsx": "^4.0.0"
   },
   "dependencies": {
     "@blocksuite/blocks": "^0.16.0",

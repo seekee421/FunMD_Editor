@@ -17,6 +17,17 @@ body {
   min-height: 100vh;
 }
 
+/* BlockSuite 标题占位符：根据 data-lang 切换 */
+html[data-lang='zh-CN'] doc-title .doc-title-container-empty::before {
+  content: '标题';
+}
+html[data-lang='en-US'] doc-title .doc-title-container-empty::before {
+  content: 'Title';
+}
+html[data-lang='zh-CN-bilingual'] doc-title .doc-title-container-empty::before {
+  content: '标题 (Title)';
+}
+
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
